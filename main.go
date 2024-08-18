@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"os/user"
+	"path/filepath"
 
 	"github.com/rivo/tview"
 )
@@ -23,7 +26,7 @@ func NewApplication() *Application {
 
 func main() {
 	app := NewApplication()
-	flag.StringVar(&app.folder, "folder", "~/notes/", "folder")
+	flag.StringVar(&app.folder, "folder", "notes/", "folder")
 	flag.Parse()
 
 	mainMenu(app)
@@ -49,14 +52,26 @@ func mainMenu(app *Application) {
 	app.pages.AddPage("main", list, true, true)
 }
 
+type Note struct {
+	Title string
+	Body  string
+}
+
 func switchToQuickJournalEntry(app *Application) {
 	app.form.Clear(true)
+	note := Note{}
+	app.form.AddInputField("Title", "", 30, nil, func(title string) {
+		note.Title = title
+	})
 
-	app.form.AddInputField("Title", "", 30, nil, nil).
-		AddInputField("Body", "", 30, nil, nil).
-		AddButton("Save", func() {
-			app.pages.SwitchToPage("main")
-		}).
+	app.form.AddInputField("Body", "", 30, nil, func(body string) {
+		note.Body = body
+	})
+
+	app.form.AddButton("Save", func() {
+		saveJournalEntry(app, note)
+		app.pages.SwitchToPage("main")
+	}).
 		AddButton("Quit", func() {
 			app.app.Stop()
 		})
@@ -65,4 +80,26 @@ func switchToQuickJournalEntry(app *Application) {
 
 func quickJournalEntry(app *Application) {
 	app.pages.AddPage("quickJournalEntry", app.form, true, false)
+}
+
+func saveJournalEntry(app *Application, note Note) {
+	usr, _ := user.Current()
+	dir := filepath.Join(usr.HomeDir, app.folder)
+
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		os.MkdirAll(dir, 0755)
+	}
+	fileName := filepath.Join(dir, "test.md")
+	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+		os.Create(fileName)
+
+	}
+
+	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	file.WriteString(fmt.Sprintf("- [[%s]]\n\n%s\n\n", note.Title, note.Body))
+
 }
