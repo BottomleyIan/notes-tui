@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/BottomleyIan/notes-tui/formdata"
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -32,7 +33,7 @@ func main() {
 
 	mainMenu(app)
 	quickJournalEntry(app)
-	if err := app.app.SetRoot(app.pages, true).EnableMouse(true).Run(); err != nil {
+	if err := app.app.SetRoot(app.pages, true).EnableMouse(true).EnablePaste(true).Run(); err != nil {
 		panic(err)
 	}
 
@@ -56,13 +57,18 @@ func mainMenu(app *Application) {
 func switchToQuickJournalEntry(app *Application) {
 	app.form.Clear(true)
 	note := formdata.New()
-	app.form.AddInputField("Title", "", 30, nil, func(title string) {
-		note.SetTitle(title)
-	})
+	app.form.SetFieldBackgroundColor(tcell.NewRGBColor(0, 0, 0)).
+		SetFieldTextColor(tcell.ColorWhite)
 
-	app.form.AddInputField("Body", "", 30, nil, func(body string) {
-		note.SetBody(body)
-	})
+	app.form.AddInputField("Title", "", 0, nil, note.SetTitle)
+	app.form.AddInputField("Tags", "", 0, nil, note.SetTags)
+	app.form.AddDropDown("Language", []string{"golang", "ts", "bash", "html", "css"}, 0, note.SetLanguage)
+	app.form.AddTextArea("Code Snippet", "", 0, 5, 0, note.SetCodeSnippet)
+
+	app.form.AddInputField("Url", "", 0, nil, note.SetUrl)
+	app.form.AddInputField("UrlTitle", "", 0, nil, note.SetUrlTitle)
+
+	app.form.AddTextArea("Body", "", 0, 5, 0, note.SetBody)
 
 	app.form.AddButton("Save", func() {
 		saveJournalEntry(app, note.String())
