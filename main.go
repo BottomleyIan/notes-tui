@@ -8,22 +8,25 @@ import (
 	"path/filepath"
 
 	"github.com/BottomleyIan/notes-tui/formdata"
+	"github.com/BottomleyIan/notes-tui/settings"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
 type Application struct {
-	app    *tview.Application
-	pages  *tview.Pages
-	form   *tview.Form
-	folder string
+	app      *tview.Application
+	pages    *tview.Pages
+	form     *tview.Form
+	settings settings.Settings
+	folder   string
 }
 
 func NewApplication() *Application {
 	app := tview.NewApplication()
 	pages := tview.NewPages()
 	form := tview.NewForm()
-	return &Application{app: app, pages: pages, form: form}
+	settings := settings.ParseSettingsFile()
+	return &Application{app: app, pages: pages, form: form, settings: settings}
 }
 
 func main() {
@@ -45,16 +48,21 @@ func mainMenu(app *Application) {
 		SetTitle(fmt.Sprintf("Notes in %s", app.folder)).
 		SetBorder(true).
 		SetBorderPadding(2, 2, 2, 2)
-	list.AddItem("Quick Journal Entry", "Add a quick entry to todays Journal", '1', func() {
-		switchToQuickJournalEntry(app)
-	}).
-		AddItem("Quit", "Press to exit", 'q', func() {
-			app.app.Stop()
+
+	for _, note := range app.settings.Notes {
+		list.AddItem(note.Title, note.Description, rune(note.Key[0]), func() {
+			switchToQuickJournalEntry(app, note)
 		})
+	}
+
+	list.AddItem("Quit", "Press to exit", 'q', func() {
+		app.app.Stop()
+	})
+
 	app.pages.AddPage("main", list, true, true)
 }
 
-func switchToQuickJournalEntry(app *Application) {
+func switchToQuickJournalEntry(app *Application, noteSettings settings.Note) {
 	app.form.Clear(true)
 	note := formdata.New()
 	app.form.SetFieldBackgroundColor(tcell.NewRGBColor(0, 0, 0)).
@@ -62,12 +70,13 @@ func switchToQuickJournalEntry(app *Application) {
 
 	app.form.AddInputField("Title", "", 0, nil, note.SetTitle)
 	app.form.AddInputField("Tags", "", 0, nil, note.SetTags)
-	app.form.AddDropDown("Language", []string{"golang", "ts", "bash", "html", "css"}, 0, note.SetLanguage)
+	app.form.AddDropDown("Language", app.settings.LanguageNames(), 0, note.SetLanguage)
 	app.form.AddTextArea("Code Snippet", "", 0, 5, 0, note.SetCodeSnippet)
 
-	app.form.AddInputField("Url", "", 0, nil, note.SetUrl)
-	app.form.AddInputField("UrlTitle", "", 0, nil, note.SetUrlTitle)
-
+	if noteSettings.HasUrl {
+		app.form.AddInputField("Url", "", 0, nil, note.SetUrl)
+		app.form.AddInputField("UrlTitle", "", 0, nil, note.SetUrlTitle)
+	}
 	app.form.AddTextArea("Body", "", 0, 5, 0, note.SetBody)
 
 	app.form.AddButton("Save", func() {

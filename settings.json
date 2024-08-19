@@ -1,0 +1,34 @@
+{
+  "languages": [
+    {
+      "name": "typescript",
+      "markdownName": "TypeScript"
+    },
+    {
+      "name": "Golang",
+      "markdownName": "Go"
+    },
+    {
+      "name": "css",
+      "markdownName": "CSS"
+    },
+    {
+      "name": "html",
+      "markdownName": "HTML"
+    }
+  ],
+  "notes": [
+    {
+      "title": "Test 1",
+      "description": "This is a test note",
+      "key": "a"
+    },
+    {
+      "title": "Test 2",
+      "description": "This is a test note",
+      "key": "b",
+      "hasBody": true,
+      "hasUrl": true
+    }
+  ]
+}

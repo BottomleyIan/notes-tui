@@ -7,8 +7,13 @@ import (
 
 const indent = "  "
 
-type data struct {
-	Body        string
+type Field struct {
+	value   string
+	include bool
+}
+
+type Data struct {
+	Body        Field
 	CodeSnippet string
 	Language    string
 	Tags        string
@@ -17,42 +22,47 @@ type data struct {
 	UrlTitle    string
 }
 
-func New() *data {
-	return &data{}
+func New() *Data {
+	return &Data{}
 }
 
-func (d *data) SetBody(body string) {
-	d.Body = body
+func (d *Data) SetBody(body string) {
+	d.Body.value = body
 }
 
-func (d *data) SetCodeSnippet(codeSnippet string) {
+func (d *Data) SetCodeSnippet(codeSnippet string) {
 	d.CodeSnippet = codeSnippet
 }
-func (d *data) SetLanguage(language string, _ int) {
+func (d *Data) SetLanguage(language string, _ int) {
 	d.Language = language
 }
 
-func (d *data) SetTags(tags string) {
+func (d *Data) SetTags(tags string) {
 	d.Tags = tags
 }
 
-func (d *data) SetTitle(title string) {
+func (d *Data) SetTitle(title string) {
 	d.Title = title
 }
 
-func (d *data) SetUrl(url string) {
+func (d *Data) SetUrl(url string) {
 	d.Url = url
 }
 
-func (d *data) SetUrlTitle(urlTitle string) {
+func (d *Data) SetUrlTitle(urlTitle string) {
 	d.UrlTitle = urlTitle
 }
 
-func (d *data) String() string {
-	res := fmt.Sprintf("- [[%s]]\n", d.Title)
-	if d.Body != "" {
-		res += fmt.Sprintf("%s%s\n", indent, strings.Replace(d.Body, "\n", "\n"+indent, -1))
+func (d *Data) PrintBody() string {
+	if d.Body.include && d.Body.value != "" {
+		return fmt.Sprintf("%s%s\n", indent, strings.Replace(d.Body.value, "\n", "\n"+indent, -1))
 	}
+	return ""
+}
+
+func (d *Data) String() string {
+	res := fmt.Sprintf("- [[%s]]\n", d.Title)
+	res += d.PrintBody()
 	if d.Tags != "" {
 		res += fmt.Sprintf("%s%s\n", indent, d.Tags)
 	}
