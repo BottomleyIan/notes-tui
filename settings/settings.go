@@ -10,12 +10,24 @@ type Language struct {
 	MarkdownName string `json:"markdownName"`
 }
 type Note struct {
-	Title       string
-	Description string
-	Key         string
-	HasBody     bool
-	HasUrl      bool
+	Title          string
+	Description    string
+	Key            string
+	HasBody        bool
+	HasUrl         bool
+	HasTitle       bool
+	TagFirstLine   bool
+	HasCodeSnippet bool
+	Fields         []Field
 }
+
+type Field struct {
+	Name         string
+	DefaultValue string
+	Type         string
+	Options      []string
+}
+
 type Settings struct {
 	Languages []Language
 	Notes     []Note

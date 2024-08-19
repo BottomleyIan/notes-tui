@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 
-	"github.com/BottomleyIan/notes-tui/form/builder"
 	"github.com/BottomleyIan/notes-tui/formdata"
 	"github.com/BottomleyIan/notes-tui/settings"
 	"github.com/gdamore/tcell/v2"
@@ -65,19 +65,21 @@ func mainMenu(app *Application) {
 
 func switchToQuickJournalEntry(app *Application, noteSettings settings.Note) {
 	app.form.Clear(true)
-	note := formdata.New()
+	note := formdata.New(noteSettings)
 	app.form.SetFieldBackgroundColor(tcell.NewRGBColor(0, 0, 0)).
 		SetFieldTextColor(tcell.ColorWhite)
-
-	app.form.AddInputField("Title", "", 0, nil, note.SetTitle)
-	app.form.AddInputField("Tags", "", 0, nil, note.SetTags)
-	app.form.AddDropDown("Language", app.settings.LanguageNames(), 0, note.SetLanguage)
-	app.form.AddTextArea("Code Snippet", "", 0, 5, 0, note.SetCodeSnippet)
-
-	app.form.AddTextArea("Body", "", 0, 5, 0, note.SetBody)
-	builder.AddUrl(app.form, noteSettings, note)
+	AddFormDate(app.form, noteSettings, note)
+	AddFormTitle(app.form, noteSettings, note)
+	AddFormFields(app.form, noteSettings, note)
+	AddFormUrl(app.form, noteSettings, note)
+	AddFormCodeSnippet(app.form, noteSettings, note, app.settings.LanguageNames())
+	AddFormBody(app.form, noteSettings, note)
 	app.form.AddButton("Save", func() {
-		saveJournalEntry(app, note.String())
+		saveJournalEntry(app, note.String(), note.Date)
+		app.pages.SwitchToPage("main")
+	}).AddButton("Cancel", func() {
+
+		saveJournalEntry(app, note.String(), note.Date)
 		app.pages.SwitchToPage("main")
 	}).
 		AddButton("Quit", func() {
@@ -90,14 +92,14 @@ func quickJournalEntry(app *Application) {
 	app.pages.AddPage("quickJournalEntry", app.form, true, false)
 }
 
-func saveJournalEntry(app *Application, note string) {
+func saveJournalEntry(app *Application, note string, date string) {
 	usr, _ := user.Current()
 	dir := filepath.Join(usr.HomeDir, app.folder)
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		os.MkdirAll(dir, 0755)
 	}
-	fileName := filepath.Join(dir, "test.md")
+	fileName := filepath.Join(dir, "journals", strings.ReplaceAll(date, "-", "_")+".md")
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {
 		os.Create(fileName)
 

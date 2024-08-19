@@ -19,16 +19,127 @@
   ],
   "notes": [
     {
-      "title": "Test 1",
-      "description": "This is a test note",
-      "key": "a"
+      "title": "Note",
+      "description": "Add a note",
+      "key": "n",
+      "hasBody": true,
+      "hasTitle": true,
+      "tagFirstLine": true,
+      "hasUrl": true,
+      "fields": [{ "name": "tags" }]
     },
     {
-      "title": "Test 2",
-      "description": "This is a test note",
+      "title": "Code Snippet",
+      "description": "Add a code snippet",
+      "key": "c",
+      "hasCodeSnippet": true,
+      "hasTitle": false,
+      "tagFirstLine": true,
+      "hasUrl": true,
+      "fields": [{ "name": "tags" }]
+    },
+    {
+      "title": "",
+      "description": "Add a simple bullet point",
+      "key": "o",
+      "hasBody": false,
+      "hasTitle": true,
+      "tagFirstLine": false,
+      "hasUrl": false,
+      "fields": []
+    },
+    {
+      "title": "TODO",
+      "description": "Add a todo item",
+      "key": "t",
+      "hasUrl": true,
+      "hasTitle": true,
+      "fields": [{ "name": "tags" }]
+    },
+    {
+      "title": "Bookmark",
+      "description": "Add a bookmark",
+      "key": "m",
+      "hasUrl": true,
+      "fields": [{ "name": "tags" }]
+    },
+    {
+      "title": "Shortcuts",
+      "description": "Add a shortcut for a program",
+      "key": "s",
+      "hasUrl": true,
+      "fields": [
+        { "name": "tags" },
+        {
+          "name": "program",
+          "type": "select",
+          "options": ["nvim", "iterm", "tmux", "chrome"]
+        },
+        { "name": "action" },
+        { "name": "keys" }
+      ]
+    },
+    {
+      "title": "Film",
+      "description": "Record information about a film",
       "key": "b",
       "hasBody": true,
-      "hasUrl": true
+      "hasTitle": true,
+      "tagFirstLine": true,
+      "hasUrl": true,
+      "fields": [
+        {
+          "name": "type",
+          "defaultValue": "film"
+        },
+        {
+          "name": "rating",
+          "defaultValue": "Awesome",
+          "type": "select",
+          "options": ["Awesome", "Very Good", "Good", "Okay", "Bad", "Terrible"]
+        },
+        {
+          "name": "genre",
+          "defaultValue": ""
+        },
+        {
+          "name": "series",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "title": "Book",
+      "description": "Record information about a book",
+      "key": "b",
+      "hasBody": true,
+      "hasTitle": true,
+      "tagFirstLine": true,
+      "hasUrl": true,
+      "fields": [
+        {
+          "name": "type",
+          "defaultValue": "book"
+        },
+        {
+          "name": "rating",
+          "defaultValue": "Awesome",
+          "type": "select",
+          "options": ["Awesome", "Very Good", "Good", "Okay", "Bad", "Terrible"]
+        },
+        {
+          "name": "genre",
+          "defaultValue": ""
+        },
+        {
+          "name": "author",
+          "defaultValue": ""
+        },
+        {
+          "name": "series",
+          "defaultValue": ""
+        }
+      ]
     }
   ]
 }
