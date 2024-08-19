@@ -79,7 +79,6 @@ func switchToQuickJournalEntry(app *Application, noteSettings settings.Note) {
 		app.pages.SwitchToPage("main")
 	}).AddButton("Cancel", func() {
 
-		saveJournalEntry(app, note.String(), note.Date)
 		app.pages.SwitchToPage("main")
 	}).
 		AddButton("Quit", func() {
