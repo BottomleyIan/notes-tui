@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"path/filepath"
 
+	"github.com/BottomleyIan/notes-tui/form/builder"
 	"github.com/BottomleyIan/notes-tui/formdata"
 	"github.com/BottomleyIan/notes-tui/settings"
 	"github.com/gdamore/tcell/v2"
@@ -73,12 +74,8 @@ func switchToQuickJournalEntry(app *Application, noteSettings settings.Note) {
 	app.form.AddDropDown("Language", app.settings.LanguageNames(), 0, note.SetLanguage)
 	app.form.AddTextArea("Code Snippet", "", 0, 5, 0, note.SetCodeSnippet)
 
-	if noteSettings.HasUrl {
-		app.form.AddInputField("Url", "", 0, nil, note.SetUrl)
-		app.form.AddInputField("UrlTitle", "", 0, nil, note.SetUrlTitle)
-	}
 	app.form.AddTextArea("Body", "", 0, 5, 0, note.SetBody)
-
+	builder.AddUrl(app.form, noteSettings, note)
 	app.form.AddButton("Save", func() {
 		saveJournalEntry(app, note.String())
 		app.pages.SwitchToPage("main")
