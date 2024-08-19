@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"path/filepath"
 
+	"github.com/BottomleyIan/notes-tui/formdata"
 	"github.com/rivo/tview"
 )
 
@@ -52,24 +53,19 @@ func mainMenu(app *Application) {
 	app.pages.AddPage("main", list, true, true)
 }
 
-type Note struct {
-	Title string
-	Body  string
-}
-
 func switchToQuickJournalEntry(app *Application) {
 	app.form.Clear(true)
-	note := Note{}
+	note := formdata.New()
 	app.form.AddInputField("Title", "", 30, nil, func(title string) {
-		note.Title = title
+		note.SetTitle(title)
 	})
 
 	app.form.AddInputField("Body", "", 30, nil, func(body string) {
-		note.Body = body
+		note.SetBody(body)
 	})
 
 	app.form.AddButton("Save", func() {
-		saveJournalEntry(app, note)
+		saveJournalEntry(app, note.String())
 		app.pages.SwitchToPage("main")
 	}).
 		AddButton("Quit", func() {
@@ -82,7 +78,7 @@ func quickJournalEntry(app *Application) {
 	app.pages.AddPage("quickJournalEntry", app.form, true, false)
 }
 
-func saveJournalEntry(app *Application, note Note) {
+func saveJournalEntry(app *Application, note string) {
 	usr, _ := user.Current()
 	dir := filepath.Join(usr.HomeDir, app.folder)
 
@@ -100,6 +96,6 @@ func saveJournalEntry(app *Application, note Note) {
 		panic(err)
 	}
 	defer file.Close()
-	file.WriteString(fmt.Sprintf("- [[%s]]\n\n%s\n\n", note.Title, note.Body))
+	file.WriteString(note)
 
 }
