@@ -1,9 +1,12 @@
 package settings
 
 import (
+	"embed"
 	"encoding/json"
-	"os"
 )
+
+//go:embed settings.json
+var embedFS embed.FS
 
 type Language struct {
 	Name         string `json:"name"`
@@ -35,7 +38,10 @@ type Settings struct {
 
 func ParseSettingsFile() Settings {
 	settings := Settings{}
-	fileBytes, _ := os.ReadFile("settings.json")
+	fileBytes, err := embedFS.ReadFile("settings.json")
+	if err != nil {
+		panic(err)
+	}
 	json.Unmarshal(fileBytes, &settings)
 	return settings
 }
